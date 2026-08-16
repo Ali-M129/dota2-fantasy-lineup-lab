@@ -299,7 +299,10 @@ def average_stat(value_a, value_b):
 
 
 def build_averaged_table(path_a, path_b):
-    """Average two per-position score CSVs (same stat columns) into one table, per team."""
+    """Average two per-position score CSVs (same stat columns) into one table, per team.
+    Also combines the "player" column from both sides into one "player" field
+    (e.g. "ammar_T_F, skiter"), same as mid_score.csv already has, so core/support
+    rows can show a player-style label in the frontend too."""
     fields_a, rows_a = load_score_csv(path_a)
     fields_b, rows_b = load_score_csv(path_b)
 
@@ -316,14 +319,18 @@ def build_averaged_table(path_a, path_b):
         if row_b is None:
             print(f"Warning: '{team}' has no row in {os.path.basename(path_b)} -- using {os.path.basename(path_a)} values as-is.")
 
-        out_row = {"team": team}
+        player_a = (row_a.get("player") or "").strip() if row_a else ""
+        player_b = (row_b.get("player") or "").strip() if row_b else ""
+        combined_player = ", ".join(p for p in (player_a, player_b) if p)
+
+        out_row = {"team": team, "player": combined_player}
         for col in stat_columns:
             val_a = row_a.get(col) if row_a else None
             val_b = row_b.get(col) if row_b else None
             out_row[col] = average_stat(val_a, val_b)
         output_rows.append(out_row)
 
-    return ["team"] + stat_columns, output_rows
+    return ["team", "player"] + stat_columns, output_rows
 
 
 def save_final_csv(fieldnames, rows, filename):
@@ -373,11 +380,13 @@ def aggregate_final_scores():
 # ---------------------------------------------------------------------------
 
 # which final_scores file feeds which role in the frontend, and whether
-# that file has a "player" column (only mid_score.csv does)
+# that file has a "player" column (all three do now: core/support combine
+# both position players' names, e.g. "ammar_T_F, skiter"; mid keeps its
+# single player as before)
 SITE_ROLE_FILES = {
-    "core": ("core_score.csv", False),
+    "core": ("core_score.csv", True),
     "mid": ("mid_score.csv", True),
-    "support": ("support_score.csv", False),
+    "support": ("support_score.csv", True),
 }
 
 

@@ -342,9 +342,9 @@
 let DATA = null;
 
 const ROLES = [
-  {key:"core", label:"Core", color:"var(--core)", hasPlayer:false},
+  {key:"core", label:"Core", color:"var(--core)", hasPlayer:true},
   {key:"mid", label:"Mid", color:"var(--mid)", hasPlayer:true},
-  {key:"support", label:"Support", color:"var(--support)", hasPlayer:false},
+  {key:"support", label:"Support", color:"var(--support)", hasPlayer:true},
 ];
 
 // fixed banner order per role -- matches score_pipeline.py's ROLE_CATEGORIES
@@ -521,9 +521,9 @@ function renderCombos(ranked){
     card.innerHTML = `
       <div class="combo-rank">${i+1}</div>
       <div class="combo-roles">
-        <div><span class="tag">core</span>${combo.core.team}</div>
+        <div><span class="tag">core</span>${combo.core.player} (${combo.core.team})</div>
         <div><span class="tag">mid</span>${combo.mid.player} (${combo.mid.team})</div>
-        <div><span class="tag">support</span>${combo.support.team}</div>
+        <div><span class="tag">support</span>${combo.support.player} (${combo.support.team})</div>
       </div>
       <div class="combo-total">${combo.total.toFixed(0)}</div>
     `;
