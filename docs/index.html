@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TI 2026 · Fantasy Lineup Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0d14;
+    --panel:#12161f;
+    --panel-2:#171d29;
+    --border:#242c3a;
+    --text:#e9edf6;
+    --muted:#8b93a6;
+    --dim:#576073;
+
+    --core:#ff6b4a;
+    --mid:#f5b942;
+    --support:#38bdf8;
+    --gold:#f0b429;
+    --teal:#2dd4bf;
+    --violet:#8b6cf0;
+
+    --stat-red:#ef4444;
+    --stat-green:#22c55e;
+    --stat-blue:#38bdf8;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(circle at 12% -5%, #1a2130 0%, transparent 42%),
+      radial-gradient(circle at 90% 5%, #142226 0%, transparent 38%),
+      var(--bg);
+    color:var(--text);
+    font-family:'Rajdhani',sans-serif;
+    min-height:100vh;
+    padding:32px 20px 80px;
+  }
+  .wrap{max-width:1180px;margin:0 auto;}
+
+  .eyebrow{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    color:var(--dim);
+    margin-bottom:10px;
+  }
+  h1{
+    font-family:'Rajdhani',sans-serif;
+    font-weight:700;
+    font-size:clamp(26px,4vw,40px);
+    margin:0 0 10px;
+    line-height:1.1;
+  }
+  h1 span{color:var(--gold);}
+  .sub{color:var(--muted);font-size:14.5px;max-width:640px;line-height:1.7;margin-bottom:36px;}
+
+  .section-title{
+    font-family:'Rajdhani',sans-serif;
+    font-weight:700;
+    font-size:17px;
+    margin:0 0 16px;
+    padding-bottom:10px;
+    border-bottom:1px solid var(--border);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+  .section-title small{
+    font-family:'JetBrains Mono',monospace;
+    font-weight:500;
+    font-size:11px;
+    color:var(--dim);
+  }
+
+  .picker-row{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:14px;
+    margin-bottom:24px;
+  }
+  @media (max-width:820px){ .picker-row{grid-template-columns:1fr;} }
+
+  .picker{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:16px;
+    display:flex;
+    flex-direction:column;
+  }
+  .picker-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:12px;
+  }
+  .picker-label{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color:var(--muted);
+    display:flex;
+    align-items:center;
+    gap:8px;
+    direction:ltr;
+  }
+  .role-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+  .role-dot.core{background:var(--core);}
+  .role-dot.mid{background:var(--mid);}
+  .role-dot.support{background:var(--support);}
+
+  .banner-list{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    margin-bottom:4px;
+  }
+
+  .banner-row{
+    display:flex;
+    align-items:center;
+    gap:9px;
+    background:var(--panel-2);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:8px 9px;
+  }
+  .banner-swatch{width:9px;height:9px;border-radius:3px;flex-shrink:0;}
+  .banner-swatch.red{background:var(--stat-red);}
+  .banner-swatch.green{background:var(--stat-green);}
+  .banner-swatch.blue{background:var(--stat-blue);}
+
+  .banner-select{
+    flex:1;
+    min-width:0;
+    background:var(--bg);
+    border:1px solid var(--border);
+    border-radius:6px;
+    color:var(--text);
+    font-size:12.5px;
+    padding:6px 8px;
+    font-family:'Rajdhani',sans-serif;
+  }
+  .banner-select:focus{outline:none;border-color:var(--teal);}
+
+  .banner-weight-wrap{
+    width:64px;
+    flex-shrink:0;
+    display:flex;
+    align-items:center;
+    background:var(--bg);
+    border:1px solid var(--border);
+    border-radius:6px;
+    padding:6px 6px 6px 2px;
+    direction:ltr;
+  }
+  .banner-weight-wrap:focus-within{border-color:var(--teal);}
+  .banner-weight{
+    width:100%;
+    min-width:0;
+    background:transparent;
+    border:none;
+    color:var(--text);
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    text-align:right;
+    padding:0;
+    -moz-appearance:textfield;
+  }
+  .banner-weight:focus{outline:none;}
+  .banner-weight::-webkit-outer-spin-button,
+  .banner-weight::-webkit-inner-spin-button{
+    -webkit-appearance:none;
+    margin:0;
+  }
+  .banner-weight-suffix{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    color:var(--dim);
+    padding-left:2px;
+  }
+
+  .hint{font-size:11.5px;color:var(--dim);margin-top:10px;line-height:1.6;}
+
+  .build-row{
+    display:flex;
+    justify-content:center;
+    margin:8px 0 44px;
+  }
+  .build-btn{
+    font-family:'Rajdhani',sans-serif;
+    font-weight:700;
+    font-size:17px;
+    letter-spacing:.02em;
+    background:linear-gradient(135deg,var(--gold),#d99420);
+    color:#181104;
+    border:none;
+    border-radius:10px;
+    padding:14px 42px;
+    cursor:pointer;
+    box-shadow:0 8px 24px -8px rgba(240,180,41,.5);
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .build-btn:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 10px 28px -8px rgba(240,180,41,.65);}
+  .build-btn:disabled{
+    background:var(--panel-2);
+    color:var(--dim);
+    box-shadow:none;
+    cursor:not-allowed;
+  }
+  .build-status{
+    text-align:center;
+    font-family:'JetBrains Mono',monospace;
+    font-size:11.5px;
+    color:var(--dim);
+    margin-top:10px;
+  }
+
+  #results{display:none;}
+  #results.visible{display:block;}
+
+  .rank-row{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:14px;
+    margin-bottom:32px;
+  }
+  @media (max-width:820px){ .rank-row{grid-template-columns:1fr;} }
+
+  .rank-panel{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:16px;
+  }
+  .rank-item{
+    display:grid;
+    grid-template-columns:20px 1fr auto;
+    align-items:center;
+    gap:8px;
+    padding:6px 0;
+  }
+  .rank-item .n{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--dim);direction:ltr;}
+  .rank-item .name{font-size:13px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .rank-item .name small{color:var(--muted);font-size:11px;}
+  .rank-item .score{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--role-color);direction:ltr;}
+  .bar-track{grid-column:1/-1;height:4px;background:var(--panel-2);border-radius:3px;overflow:hidden;margin-bottom:4px;}
+  .bar-fill{height:100%;background:var(--role-color);border-radius:3px;}
+
+  .combos-title{margin-bottom:16px;}
+  .combo-list{display:flex;flex-direction:column;gap:10px;}
+  .combo-card{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:14px 16px;
+    display:grid;
+    grid-template-columns:36px 1fr auto;
+    align-items:center;
+    gap:14px;
+  }
+  .combo-card.top{border-color:var(--gold);background:linear-gradient(135deg,rgba(240,180,41,.08),var(--panel));}
+  .combo-rank{
+    font-family:'Rajdhani',sans-serif;
+    font-weight:700;
+    font-size:20px;
+    color:var(--dim);
+    text-align:center;
+  }
+  .combo-card.top .combo-rank{color:var(--gold);}
+  .combo-roles{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px 16px;
+    font-size:13px;
+  }
+  .combo-roles span.tag{
+    font-family:'JetBrains Mono',monospace;
+    font-size:9.5px;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    color:var(--dim);
+    margin-left:5px;
+    direction:ltr;
+    display:inline-block;
+  }
+  .combo-total{
+    font-family:'JetBrains Mono',monospace;
+    font-size:15px;
+    font-weight:600;
+    color:var(--gold);
+    direction:ltr;
+    white-space:nowrap;
+  }
+
+  footer{
+    margin-top:56px;
+    text-align:center;
+    font-size:11.5px;
+    color:var(--dim);
+    font-family:'JetBrains Mono',monospace;
+    direction:ltr;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">TI 2026 · FANTASY LINEUP LAB</div>
+    <h1>Suggested <span>Lineup</span></h1>
+    <p class="sub">Pick 5 stats for each role (Core / Mid / Support), assign each a weight, and the tool ranks and combines the best core + best mid + best support for you.</p>
+  </header>
+
+  <div class="section-title">Pick Stats & Weights <small>PICK 5 PER ROLE</small></div>
+  <div class="picker-row" id="pickers"></div>
+
+  <div class="build-row">
+    <div style="display:flex;flex-direction:column;align-items:center;">
+      <button class="build-btn" id="buildBtn" disabled>Build Best Lineup</button>
+      <div class="build-status" id="buildStatus">Set each banner's stat and weight, then click</div>
+    </div>
+  </div>
+
+  <div id="results">
+    <div class="section-title">Top Picks Per Role <small>TOP PER ROLE</small></div>
+    <div class="rank-row" id="rankRow"></div>
+
+    <div class="section-title combos-title">Top Lineups <small>TOP 10 LINEUPS</small></div>
+    <div class="combo-list" id="comboList"></div>
+  </div>
+
+  <footer>core_score.csv · mid_score.csv · support_score.csv — TI2026 stat brain</footer>
+</div>
+
+<script>
+let DATA = null;
+
+const ROLES = [
+  {key:"core", label:"Core", color:"var(--core)", hasPlayer:false},
+  {key:"mid", label:"Mid", color:"var(--mid)", hasPlayer:true},
+  {key:"support", label:"Support", color:"var(--support)", hasPlayer:false},
+];
+
+// fixed banner order per role -- matches score_pipeline.py's ROLE_CATEGORIES
+// (core = carry+offlane -> red,green | mid -> red,green,blue | support -> green,blue)
+const BANNER_LAYOUT = {
+  core:    ["red","green","red","green","red"],
+  mid:     ["red","blue","green","red","green"],
+  support: ["blue","green","blue","green","blue"],
+};
+
+// STAT_COLORS is populated from DATA.meta.stat_colors after fetch (init()),
+// not hardcoded here -- keeps it in sync with score_pipeline.py's actual
+// scoring categories, so a stat added/removed on the backend never drifts
+// out of sync with the frontend picker.
+let STAT_COLORS = null;
+
+// selections[role] = [{color, stat, weight}, ...] -- weight is a percent
+// (100 = neutral multiplier of 1, range 50-400), one entry per banner
+const selections = {core:[], mid:[], support:[]};
+
+function buildPickers(){
+  const container = document.getElementById("pickers");
+  ROLES.forEach(role=>{
+    const layout = BANNER_LAYOUT[role.key];
+
+    // give each banner a distinct default stat within its color
+    // (1st red banner -> 1st red stat, 2nd red banner -> 2nd red stat, ...)
+    const colorSeen = {red:0, green:0, blue:0};
+    selections[role.key] = layout.map(color=>{
+      const stat = STAT_COLORS[color][colorSeen[color]++];
+      return {color, stat, weight:100};
+    });
+
+    const panel = document.createElement("div");
+    panel.className = "picker";
+    panel.dataset.role = role.key;
+    panel.innerHTML = `
+      <div class="picker-head">
+        <div class="picker-label"><span class="role-dot ${role.key}"></span>${role.label}</div>
+      </div>
+      <div class="banner-list" id="list-${role.key}"></div>
+      <div class="hint">Banner count and color are fixed (matching this role's category); only each banner's stat and weight can be changed.</div>
+    `;
+    container.appendChild(panel);
+
+    renderRoleBanners(role.key);
+  });
+
+  document.getElementById("buildBtn").disabled = false;
+}
+
+function renderRoleBanners(roleKey){
+  const layout = BANNER_LAYOUT[roleKey];
+  const list = document.getElementById(`list-${roleKey}`);
+  list.innerHTML = "";
+
+  layout.forEach((color,i)=>{
+    const slot = selections[roleKey][i];
+    // a stat already picked by another banner of the SAME color in this
+    // role can't be picked again here -- keeps the 5 banners distinct
+    const usedBySiblings = selections[roleKey]
+      .filter((s,j)=> j!==i && s.color===color)
+      .map(s=>s.stat);
+    const options = STAT_COLORS[color].filter(stat=> !usedBySiblings.includes(stat));
+
+    const row = document.createElement("div");
+    row.className = "banner-row";
+    row.innerHTML = `
+      <span class="banner-swatch ${color}"></span>
+      <select class="banner-select" data-slot="${i}">
+        ${options.map(opt=>`<option value="${opt}"${opt===slot.stat ? " selected" : ""}>${opt}</option>`).join("")}
+      </select>
+      <div class="banner-weight-wrap">
+        <input type="number" class="banner-weight" data-slot="${i}" value="${slot.weight}" min="50" max="400" step="5">
+        <span class="banner-weight-suffix">%</span>
+      </div>
+    `;
+    list.appendChild(row);
+  });
+
+  list.querySelectorAll("select.banner-select").forEach(sel=>{
+    sel.addEventListener("change", ()=>{
+      const i = +sel.dataset.slot;
+      selections[roleKey][i].stat = sel.value;
+      renderRoleBanners(roleKey); // re-render so sibling same-color banners drop the now-taken stat
+    });
+  });
+  list.querySelectorAll("input.banner-weight").forEach(inp=>{
+    const i = +inp.dataset.slot;
+    const clamp = ()=>{
+      let val = Math.round(parseFloat(inp.value));
+      if(isNaN(val)) val = 100;
+      val = Math.min(400, Math.max(50, val));
+      inp.value = val;
+      selections[roleKey][i].weight = val;
+    };
+    inp.addEventListener("input", ()=>{
+      selections[roleKey][i].weight = parseFloat(inp.value) || 100;
+    });
+    inp.addEventListener("blur", clamp);
+    inp.addEventListener("change", clamp);
+  });
+}
+
+function computeScores(roleKey){
+  const weights = {};
+  selections[roleKey].forEach(s=>{ weights[s.stat] = s.weight / 100; });
+  const rows = DATA[roleKey].rows.map(row=>{
+    let score = 0;
+    for(const col in weights){ score += (row[col] || 0) * weights[col]; }
+    return {...row, score};
+  });
+  rows.sort((a,b)=> b.score - a.score);
+  return rows;
+}
+
+function labelFor(role, row){
+  if(role.hasPlayer) return `${row.player} <small>(${row.team})</small>`;
+  return row.team;
+}
+function plainLabelFor(role, row){
+  if(role.hasPlayer) return `${row.player} (${row.team})`;
+  return row.team;
+}
+
+function renderRankings(ranked){
+  const rankRow = document.getElementById("rankRow");
+  rankRow.innerHTML = "";
+  ROLES.forEach(role=>{
+    const rows = ranked[role.key];
+    const max = rows[0].score;
+    const panel = document.createElement("div");
+    panel.className = "rank-panel";
+    panel.style.setProperty("--role-color", role.color);
+    panel.innerHTML = `<div class="picker-label" style="margin-bottom:10px;"><span class="role-dot ${role.key}"></span>${role.label}</div>`;
+    rows.slice(0,8).forEach((row,i)=>{
+      const pct = max > 0 ? Math.max(4,(row.score/max)*100) : 0;
+      const el = document.createElement("div");
+      el.innerHTML = `
+        <div class="rank-item">
+          <div class="n">${i+1}</div>
+          <div class="name">${labelFor(role,row)}</div>
+          <div class="score">${row.score.toFixed(0)}</div>
+        </div>
+        <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
+      `;
+      panel.appendChild(el);
+    });
+    rankRow.appendChild(panel);
+  });
+}
+
+function renderCombos(ranked){
+  const core = ranked.core, mid = ranked.mid, support = ranked.support;
+  const combos = [];
+  for(const c of core){
+    for(const m of mid){
+      for(const s of support){
+        combos.push({
+          core:c, mid:m, support:s,
+          total: c.score + m.score + s.score
+        });
+      }
+    }
+  }
+  combos.sort((a,b)=> b.total - a.total);
+  const top = combos.slice(0,10);
+
+  const list = document.getElementById("comboList");
+  list.innerHTML = "";
+  top.forEach((combo,i)=>{
+    const card = document.createElement("div");
+    card.className = "combo-card" + (i===0 ? " top" : "");
+    card.innerHTML = `
+      <div class="combo-rank">${i+1}</div>
+      <div class="combo-roles">
+        <div><span class="tag">core</span>${combo.core.team}</div>
+        <div><span class="tag">mid</span>${combo.mid.player} (${combo.mid.team})</div>
+        <div><span class="tag">support</span>${combo.support.team}</div>
+      </div>
+      <div class="combo-total">${combo.total.toFixed(0)}</div>
+    `;
+    list.appendChild(card);
+  });
+}
+
+document.getElementById("buildBtn").addEventListener("click", ()=>{
+  const ranked = {
+    core: computeScores("core"),
+    mid: computeScores("mid"),
+    support: computeScores("support"),
+  };
+  renderRankings(ranked);
+  renderCombos(ranked);
+  document.getElementById("results").classList.add("visible");
+  document.getElementById("results").scrollIntoView({behavior:"smooth", block:"start"});
+});
+
+async function init(){
+  try{
+    const res = await fetch("data.json");
+    if(!res.ok) throw new Error("HTTP " + res.status);
+    DATA = await res.json();
+    STAT_COLORS = DATA.meta.stat_colors;
+  } catch(err){
+    document.getElementById("pickers").innerHTML =
+      `<div style="grid-column:1/-1;color:var(--core);font-family:'JetBrains Mono',monospace;font-size:13px;">
+        Failed to load data.json. If you opened this file directly (file://),
+        fetch() is blocked by the browser -- serve this folder over HTTP instead
+        (e.g. "python -m http.server" inside site/, then open localhost).
+        Details: ${err.message}
+      </div>`;
+    return;
+  }
+  buildPickers();
+}
+init();
+</script>
+</body>
+</html>
