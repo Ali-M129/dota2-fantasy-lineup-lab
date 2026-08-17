@@ -107,6 +107,35 @@ no build step, no separate branch needed.
 Any time you regenerate `docs/data.json` (via the pipeline) and push, the
 live site updates automatically — no HTML changes required.
 
+## Prefix suggestion
+
+On top of the role scores, the pipeline also estimates which **prefix
+title** (Crimson, Cerulean, Royal, ...) is worth taking for a given
+lineup. A prefix gives a fixed bonus, but only on maps where the hero
+played belongs to that prefix's hero pool — so its value depends on how
+often a lineup's players actually pick from that pool.
+
+- `pipeline/prefixes.py` — reference data (bonus % + hero pool) for each
+  prefix, ported from
+  [TinyKiecoo/Calculator-for-DOTA2-TI-Fantasy](https://github.com/TinyKiecoo/Calculator-for-DOTA2-TI-Fantasy).
+- `pipeline/prefix_analysis.py` — reuses `stats_analysis.py`'s role-owner
+  detection to compute each team's core/mid/support hero-pick % per
+  prefix (repeat picks count extra, on purpose), then merges it into
+  `docs/data.json` as `prefixPickPct` per row plus a `meta.prefixes`
+  block. Runs automatically as step 6 of `build_dataset.py`, or on its
+  own: `python pipeline/prefix_analysis.py data/matches/<file>.json`
+  (needs `docs/data.json` to already exist).
+- Combining core/mid/support into one roster-level prefix pick % weighs
+  **mid double** core's or support's weight — core and support are each
+  an average of two real players (smoothing out one player's hero-pool
+  lean), while mid is a single, undiluted player, so doubling it keeps
+  the three slots on equal footing. See the comments at the top of
+  `pipeline/prefix_analysis.py` for the full reasoning.
+- The frontend (`docs/index.html`) shows the best prefix inline on every
+  suggested lineup, plus a manual section where you pick a specific
+  core/mid/support entry and get the top 3 prefixes (pick %, bonus %,
+  and expected/"final" %) for that exact lineup.
+
 ## Tech notes
 
 - **Data source:** [OpenDota API](https://docs.opendota.com/), no API key

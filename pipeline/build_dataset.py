@@ -24,7 +24,10 @@ Runs the whole data pipeline for TI league_id=19719 end to end:
 5. Runs score_pipeline.py's export_site_json()
    -> docs/data.json (what the live site actually fetches)
 
-By default all 5 steps run. Use --from to start partway through and skip
+6. Runs prefix_analysis.py's run() to add hero-pick-rate-per-prefix data
+   -> docs/data.json (adds `prefixPickPct` per row + `meta.prefixes`)
+
+By default all 6 steps run. Use --from to start partway through and skip
 the earlier ones -- e.g. you already have data/matches/ti_19719_matches.json
 and just changed a scoring formula, so you only want to redo steps 3-5:
 
@@ -45,6 +48,7 @@ from pathlib import Path
 
 import fetch_matches as fetcher
 import score_pipeline
+import prefix_analysis
 
 PIPELINE_DIR = Path(__file__).resolve().parent
 LEAGUE_ID = 19719
@@ -112,6 +116,12 @@ def run_site_export():
         sys.exit(1)
 
 
+def run_prefix_injection(matches_path):
+    """Step 6: run prefix_analysis.py to add prefixPickPct + meta.prefixes to docs/data.json."""
+    print("\n=== Step 6: computing prefix pick rates ===")
+    prefix_analysis.run(matches_path)
+
+
 def main():
     parser = argparse.ArgumentParser(description="Build the TI stats dataset, optionally starting partway through.")
     parser.add_argument(
@@ -146,6 +156,7 @@ def main():
         print("Skipping final aggregation -- reusing existing data/final_scores/ files")
 
     run_site_export()
+    run_prefix_injection(matches_path)
     print("\nPipeline finished.")
 
 
