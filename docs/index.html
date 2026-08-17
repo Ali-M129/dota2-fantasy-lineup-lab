@@ -584,12 +584,11 @@ function renderRoleBanners(roleKey){
 
   layout.forEach((color,i)=>{
     const slot = selections[roleKey][i];
-    // a stat already picked by another banner of the SAME color in this
-    // role can't be picked again here -- keeps the 5 banners distinct
-    const usedBySiblings = selections[roleKey]
-      .filter((s,j)=> j!==i && s.color===color)
-      .map(s=>s.stat);
-    const options = STAT_COLORS[color].filter(stat=> !usedBySiblings.includes(stat));
+    // duplicates are allowed on purpose: the same stat can be picked by
+    // more than one banner (of the same color) with a different weight
+    // each -- computeScores() sums every banner's contribution
+    // independently, so a repeat just counts that stat twice.
+    const options = STAT_COLORS[color];
 
     const row = document.createElement("div");
     row.className = "banner-row";
@@ -610,7 +609,6 @@ function renderRoleBanners(roleKey){
     sel.addEventListener("change", ()=>{
       const i = +sel.dataset.slot;
       selections[roleKey][i].stat = sel.value;
-      renderRoleBanners(roleKey); // re-render so sibling same-color banners drop the now-taken stat
       saveState({selections});
     });
   });
@@ -633,11 +631,14 @@ function renderRoleBanners(roleKey){
 }
 
 function computeScores(roleKey){
-  const weights = {};
-  selections[roleKey].forEach(s=>{ weights[s.stat] = s.weight / 100; });
+  // Iterate the picks directly (not a {stat: weight} dict) so a stat
+  // picked by more than one banner contributes once PER banner, each
+  // with its own weight, instead of the later pick silently overwriting
+  // the earlier one's weight.
+  const picks = selections[roleKey];
   const rows = DATA[roleKey].rows.map(row=>{
     let score = 0;
-    for(const col in weights){ score += (row[col] || 0) * weights[col]; }
+    for(const s of picks){ score += (row[s.stat] || 0) * (s.weight / 100); }
     return {...row, score};
   });
   rows.sort((a,b)=> b.score - a.score);
