@@ -14,6 +14,8 @@ PART 2 -- final scores
     = avg(soft_support_score, hard_support_score); mid_score.csv is
     copied through unchanged. A team missing from one side of an
     average is carried through as-is, with a warning.
+    Every value written out here (all three files) is then multiplied
+    by DOUBLE_MULTIPLIER (currently 2x) -- see the constant below for why.
     -> data/final_scores/{core,support,mid}_score.csv
 
 PART 3 -- docs/data.json
@@ -30,7 +32,6 @@ Usage:
 import csv
 import json
 import os
-import shutil
 import sys
 from pathlib import Path
 
@@ -274,8 +275,23 @@ AVERAGE_GROUPS = [
     ("support_score.csv", ["soft_support_score.csv", "hard_support_score.csv"]),
 ]
 
-# score file copied through as-is, no averaging
+# score file passed through to FINAL_DIR unaveraged, but still gets
+# DOUBLE_MULTIPLIER applied like everything else in this stage
 PASSTHROUGH_FILES = ["mid_score.csv"]
+
+# Every stat value written to data/final_scores/*.csv (and therefore
+# docs/data.json, since export_site_json() just reads those files) gets
+# multiplied by this at the end of PART 2 -- applied uniformly to
+# core_score.csv, mid_score.csv, AND support_score.csv so nothing drifts
+# out of scale relative to the others.
+DOUBLE_MULTIPLIER = 2
+
+
+def double_row_stats(row, stat_columns):
+    """Multiply every stat column in `row` by DOUBLE_MULTIPLIER, in place. 'n/a' stays 'n/a'."""
+    for col in stat_columns:
+        val = row.get(col)
+        row[col] = val if val in (None, "n/a") else round(float(val) * DOUBLE_MULTIPLIER, 1)
 
 
 def load_score_csv(path):
@@ -327,7 +343,7 @@ def build_averaged_table(path_a, path_b):
         for col in stat_columns:
             val_a = row_a.get(col) if row_a else None
             val_b = row_b.get(col) if row_b else None
-            out_row[col] = average_stat(val_a, val_b) * 2
+            out_row[col] = average_stat(val_a, val_b)
         output_rows.append(out_row)
 
     return ["team", "player"] + stat_columns, output_rows
@@ -347,7 +363,9 @@ def save_final_csv(fieldnames, rows, filename):
 def aggregate_final_scores():
     """
     Build core_score.csv, support_score.csv, and mid_score.csv in
-    FINAL_DIR from whatever's currently in POSITION_DIR.
+    FINAL_DIR from whatever's currently in POSITION_DIR. Every value in
+    all three files is multiplied by DOUBLE_MULTIPLIER on the way out
+    (see the constant's comment above for why).
     Callable directly (e.g. from build_dataset.py) as well as via the CLI below.
     """
     os.makedirs(FINAL_DIR, exist_ok=True)
@@ -362,6 +380,9 @@ def aggregate_final_scores():
             continue
 
         fieldnames, rows = build_averaged_table(path_a, path_b)
+        stat_columns = [c for c in fieldnames if c not in ("team", "player")]
+        for row in rows:
+            double_row_stats(row, stat_columns)
         save_final_csv(fieldnames, rows, output_name)
 
     for filename in PASSTHROUGH_FILES:
@@ -369,10 +390,13 @@ def aggregate_final_scores():
         if not os.path.exists(src):
             print(f"Skipping {filename}: not found in {POSITION_DIR}. Run compute_for_role() for it first.")
             continue
-        os.makedirs(FINAL_DIR, exist_ok=True)
-        dst = os.path.join(FINAL_DIR, filename)
-        shutil.copyfile(src, dst)
-        print(f"Copied: {dst}")
+
+        fieldnames, rows_by_team = load_score_csv(src)
+        stat_columns = [c for c in fieldnames if c not in ("team", "player")]
+        rows = [rows_by_team[team] for team in sorted(rows_by_team)]
+        for row in rows:
+            double_row_stats(row, stat_columns)
+        save_final_csv(fieldnames, rows, filename)
 
 
 # ---------------------------------------------------------------------------
