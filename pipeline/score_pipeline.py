@@ -327,7 +327,7 @@ def build_averaged_table(path_a, path_b):
         for col in stat_columns:
             val_a = row_a.get(col) if row_a else None
             val_b = row_b.get(col) if row_b else None
-            out_row[col] = average_stat(val_a, val_b)
+            out_row[col] = average_stat(val_a, val_b) * 2
         output_rows.append(out_row)
 
     return ["team", "player"] + stat_columns, output_rows

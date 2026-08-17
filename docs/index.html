@@ -49,6 +49,32 @@
     color:var(--dim);
     margin-bottom:10px;
   }
+  .header-top{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:14px;
+    margin-bottom:10px;
+  }
+  .header-top .eyebrow{margin-bottom:0;}
+  .github-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:20px;
+    padding:6px 13px 6px 11px;
+    color:var(--muted);
+    text-decoration:none;
+    font-family:'JetBrains Mono',monospace;
+    font-size:11.5px;
+    letter-spacing:.02em;
+    white-space:nowrap;
+    transition:border-color .12s ease, color .12s ease, background .12s ease;
+  }
+  .github-badge svg{width:15px;height:15px;flex-shrink:0;fill:currentColor;}
+  .github-badge:hover{border-color:var(--violet);color:var(--text);background:var(--panel-2);}
   h1{
     font-family:'Rajdhani',sans-serif;
     font-weight:700;
@@ -232,6 +258,7 @@
     margin-bottom:32px;
   }
   @media (max-width:820px){ .rank-row{grid-template-columns:1fr;} }
+  .rank-row.single{grid-template-columns:1fr;}
 
   .rank-panel{
     background:var(--panel);
@@ -378,17 +405,40 @@
   .prefix-rank-item .label{font-weight:600;}
   .prefix-rank-item .stat{font-family:'JetBrains Mono',monospace;direction:ltr;text-align:left;white-space:nowrap;}
   .prefix-rank-item .stat small{color:var(--dim);display:block;font-size:9.5px;letter-spacing:.05em;text-transform:uppercase;}
+
+  .show-more-btn{
+    display:block;
+    margin:10px auto 0;
+    background:transparent;
+    border:1px dashed var(--border);
+    color:var(--muted);
+    font-family:'JetBrains Mono',monospace;
+    font-size:10.5px;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+    border-radius:20px;
+    padding:6px 14px;
+    cursor:pointer;
+    transition:border-color .12s ease, color .12s ease;
+  }
+  .show-more-btn:hover{border-color:var(--violet);color:var(--text);}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
-    <div class="eyebrow">TI 2026 · FANTASY LINEUP LAB</div>
+    <div class="header-top">
+      <div class="eyebrow">TI 2026 · FANTASY LINEUP LAB</div>
+      <a class="github-badge" href="https://github.com/Ali-M129/dota2-fantasy-lineup-lab" target="_blank" rel="noopener noreferrer">
+        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+        <span>View on GitHub</span>
+      </a>
+    </div>
     <h1>Suggested <span>Lineup</span></h1>
     <p class="sub">Pick 5 stats for each role (Core / Mid / Support), assign each a weight, and the tool ranks and combines the best core + best mid + best support for you.</p>
   </header>
 
-  <div class="section-title">Pick Stats & Weights <small>PICK 5 PER ROLE</small></div>
+  <div class="section-title">Pick Stats & Weights <small>CHOOSE YOUR BANNERS</small></div>
   <div class="picker-row" id="pickers"></div>
 
   <div class="build-row">
@@ -404,20 +454,26 @@
 
     <div class="section-title combos-title">Top Lineups <small>TOP 10 LINEUPS</small></div>
     <div class="combo-list" id="comboList"></div>
+    <div class="build-row" id="comboShowMoreWrap" style="margin:14px 0 0;"></div>
   </div>
 
   <div class="prefix-panel" id="manualPrefixPanel" style="display:none;">
-    <div class="section-title">Best Prefix for a Hand-Picked Lineup <small>TOP 3 PREFIXES</small></div>
-    <p class="sub" style="margin-bottom:16px;">Pick a specific core, mid, and support entry and get the top 3 prefix titles for that exact lineup — pick rate, bonus, and expected (final) value for each.</p>
+    <div class="section-title">Best Prefix for a Hand-Picked Lineup <small>TOP PREFIXES</small></div>
+    <p class="sub" style="margin-bottom:16px;">Pick a specific core, mid, and support entry and get the top prefix titles for that exact lineup — pick rate, bonus, and expected (final) value for each.</p>
     <div class="prefix-pickers">
       <select id="manualCore"></select>
       <select id="manualMid"></select>
       <select id="manualSupport"></select>
     </div>
     <div class="build-row" style="margin:0 0 18px;">
-      <button class="build-btn" id="manualPrefixBtn">Get Top 3 Prefixes</button>
+      <button class="build-btn" id="manualPrefixBtn">Get Top Prefixes</button>
     </div>
     <div class="prefix-rank-list" id="manualPrefixResult"></div>
+
+    <div class="section-title" id="manualPrefixTableTitle" style="display:none;margin-top:28px;">
+      Final Score Per Prefix <small>THIS LINEUP</small>
+    </div>
+    <div class="rank-row single" id="manualPrefixTable"></div>
   </div>
 
   <footer>core_score.csv · mid_score.csv · support_score.csv — TI2026 stat brain</footer>
@@ -456,15 +512,50 @@ let PREFIXES = null;
 // (100 = neutral multiplier of 1, range 50-400), one entry per banner
 const selections = {core:[], mid:[], support:[]};
 
+// --- Persistence (localStorage) -----------------------------------------
+// Keeps banner stat/weight picks and the manual prefix picker's dropdown
+// selections across a page refresh. Deliberately does NOT persist the
+// built results themselves (rankings/combos/prefix lookup) -- those are
+// cheap to regenerate and a refresh should give a clean slate; the user
+// just clicks "Build Best Lineup" / "Get Top Prefixes" again.
+const STORAGE_KEY = "ti2026-fantasy-lineup-lab-state";
+
+function loadSavedState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch(err){
+    return {};
+  }
+}
+function saveState(patch){
+  try{
+    const current = loadSavedState();
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({...current, ...patch}));
+  } catch(err){
+    // localStorage unavailable (private mode, storage full, etc.) -- state
+    // just won't persist; nothing else in the app depends on it working.
+  }
+}
+const SAVED = loadSavedState();
+
 function buildPickers(){
   const container = document.getElementById("pickers");
   ROLES.forEach(role=>{
     const layout = BANNER_LAYOUT[role.key];
+    const savedSlots = SAVED.selections && SAVED.selections[role.key];
 
     // give each banner a distinct default stat within its color
-    // (1st red banner -> 1st red stat, 2nd red banner -> 2nd red stat, ...)
+    // (1st red banner -> 1st red stat, 2nd red banner -> 2nd red stat, ...),
+    // unless a valid saved pick exists for this slot -- then restore it.
     const colorSeen = {red:0, green:0, blue:0};
-    selections[role.key] = layout.map(color=>{
+    selections[role.key] = layout.map((color,i)=>{
+      const saved = savedSlots && savedSlots[i];
+      const savedValid = saved && saved.color===color && STAT_COLORS[color].includes(saved.stat);
+      if(savedValid){
+        colorSeen[color]++; // keep the counter moving so unsaved slots don't collide
+        return {color, stat: saved.stat, weight: saved.weight || 100};
+      }
       const stat = STAT_COLORS[color][colorSeen[color]++];
       return {color, stat, weight:100};
     });
@@ -477,8 +568,7 @@ function buildPickers(){
         <div class="picker-label"><span class="role-dot ${role.key}"></span>${role.label}</div>
       </div>
       <div class="banner-list" id="list-${role.key}"></div>
-      <div class="hint">Banner count and color are fixed (matching this role's category); only each banner's stat and weight can be changed.</div>
-    `;
+      `;
     container.appendChild(panel);
 
     renderRoleBanners(role.key);
@@ -521,6 +611,7 @@ function renderRoleBanners(roleKey){
       const i = +sel.dataset.slot;
       selections[roleKey][i].stat = sel.value;
       renderRoleBanners(roleKey); // re-render so sibling same-color banners drop the now-taken stat
+      saveState({selections});
     });
   });
   list.querySelectorAll("input.banner-weight").forEach(inp=>{
@@ -531,6 +622,7 @@ function renderRoleBanners(roleKey){
       val = Math.min(400, Math.max(50, val));
       inp.value = val;
       selections[roleKey][i].weight = val;
+      saveState({selections});
     };
     inp.addEventListener("input", ()=>{
       selections[roleKey][i].weight = parseFloat(inp.value) || 100;
@@ -592,41 +684,48 @@ function comboPrefixRanking(coreRow, midRow, supportRow){
   return ranked;
 }
 
-function renderComboPrefixLine(coreRow, midRow, supportRow){
-  if(!PREFIXES) return "";
-  const ranked = comboPrefixRanking(coreRow, midRow, supportRow);
-  const best = ranked[0];
-  if(!best) return "";
-  return `
-    <div class="combo-prefix">
-      <span class="prefix-chip">
-        <b>${best.label}</b>
-        <span class="muted">pick ${best.pickPct.toFixed(1)}%</span>
-        <span class="muted">bonus +${best.bonusPct.toFixed(0)}%</span>
-        <span class="muted">final ${best.finalPct.toFixed(2)}%</span>
-      </span>
-    </div>
-  `;
-}
-
-function renderPrefixRankList(container, ranked, limit=3){
+// Renders a ranked prefix list into `container`, showing `initial` items
+// with a "Show more" toggle that expands up to `max` items (never more
+// than 8, since that's how many prefixes exist).
+function renderPrefixRankList(container, ranked, {initial=3, max=5}={}){
   container.innerHTML = "";
   if(!ranked.length){
     container.innerHTML = `<div class="prefix-empty">No prefix data in data.json yet — run pipeline/prefix_analysis.py to add it.</div>`;
     return;
   }
-  ranked.slice(0,limit).forEach((p,i)=>{
-    const el = document.createElement("div");
-    el.className = "prefix-rank-item" + (i===0 ? " best" : "");
-    el.innerHTML = `
-      <div class="n">${i+1}</div>
-      <div class="label">${p.label}</div>
-      <div class="stat"><small>pick</small>${p.pickPct.toFixed(1)}%</div>
-      <div class="stat"><small>bonus</small>+${p.bonusPct.toFixed(0)}%</div>
-      <div class="stat"><small>final</small>${p.finalPct.toFixed(2)}%</div>
-    `;
-    container.appendChild(el);
-  });
+
+  const capped = ranked.slice(0, max);
+  const listEl = document.createElement("div");
+  listEl.className = "prefix-rank-list";
+  container.appendChild(listEl);
+
+  let expanded = false;
+  function draw(){
+    const limit = expanded ? capped.length : Math.min(initial, capped.length);
+    listEl.innerHTML = capped.slice(0,limit).map((p,i)=> `
+      <div class="prefix-rank-item${i===0 ? " best" : ""}">
+        <div class="n">${i+1}</div>
+        <div class="label">${p.label}</div>
+        <div class="stat"><small>pick</small>${p.pickPct.toFixed(1)}%</div>
+        <div class="stat"><small>bonus</small>+${p.bonusPct.toFixed(0)}%</div>
+        <div class="stat"><small>final</small>${p.finalPct.toFixed(2)}%</div>
+      </div>
+    `).join("");
+  }
+  draw();
+
+  if(capped.length > initial){
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "show-more-btn";
+    btn.textContent = `Show more (${capped.length - initial})`;
+    btn.addEventListener("click", ()=>{
+      expanded = !expanded;
+      btn.textContent = expanded ? "Show less" : `Show more (${capped.length - initial})`;
+      draw();
+    });
+    container.appendChild(btn);
+  }
 }
 
 function renderRankings(ranked){
@@ -656,6 +755,27 @@ function renderRankings(ranked){
   });
 }
 
+// Just the single best prefix for a combo card -- a compact inline chip,
+// not the full ranked list (that's reserved for the manual picker below).
+function renderComboBestPrefix(coreRow, midRow, supportRow){
+  if(!PREFIXES) return "";
+  const best = comboPrefixRanking(coreRow, midRow, supportRow)[0];
+  if(!best) return "";
+  return `
+    <div class="combo-prefix">
+      <span class="prefix-chip">
+        <b>${best.label}</b>
+        <span class="muted">pick ${best.pickPct.toFixed(1)}%</span>
+        <span class="muted">bonus +${best.bonusPct.toFixed(0)}%</span>
+        <span class="muted">final ${best.finalPct.toFixed(2)}%</span>
+      </span>
+    </div>
+  `;
+}
+
+// Builds every core x mid x support combo, sorted by total score, and
+// renders the top 3 -- with a "Show more" button revealing the rest (up
+// to 10) so the page doesn't get long before you've even asked for more.
 function renderCombos(ranked){
   const core = ranked.core, mid = ranked.mid, support = ranked.support;
   const combos = [];
@@ -673,25 +793,45 @@ function renderCombos(ranked){
   const top = combos.slice(0,10);
 
   const list = document.getElementById("comboList");
-  list.innerHTML = "";
-  top.forEach((combo,i)=>{
-    const card = document.createElement("div");
-    card.className = "combo-card" + (i===0 ? " top" : "");
-    card.innerHTML = `
-      <div class="combo-rank">${i+1}</div>
-      <div class="combo-roles">
-        <div><span class="tag">core</span>${combo.core.player} (${combo.core.team})</div>
-        <div><span class="tag">mid</span>${combo.mid.player} (${combo.mid.team})</div>
-        <div><span class="tag">support</span>${combo.support.player} (${combo.support.team})</div>
-      </div>
-      <div class="combo-total">${combo.total.toFixed(0)}</div>
-      ${renderComboPrefixLine(combo.core, combo.mid, combo.support)}
-    `;
-    list.appendChild(card);
-  });
+  const showMoreWrap = document.getElementById("comboShowMoreWrap");
+  let visibleCount = 3;
+
+  function draw(){
+    list.innerHTML = "";
+    top.slice(0, visibleCount).forEach((combo,i)=>{
+      const card = document.createElement("div");
+      card.className = "combo-card" + (i===0 ? " top" : "");
+      card.innerHTML = `
+        <div class="combo-rank">${i+1}</div>
+        <div class="combo-roles">
+          <div><span class="tag">core</span>${combo.core.player} (${combo.core.team})</div>
+          <div><span class="tag">mid</span>${combo.mid.player} (${combo.mid.team})</div>
+          <div><span class="tag">support</span>${combo.support.player} (${combo.support.team})</div>
+        </div>
+        <div class="combo-total">${combo.total.toFixed(0)}</div>
+        ${renderComboBestPrefix(combo.core, combo.mid, combo.support)}
+      `;
+      list.appendChild(card);
+    });
+
+    showMoreWrap.innerHTML = "";
+    if(top.length > 3){
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "show-more-btn";
+      const hiddenCount = top.length - 3;
+      btn.textContent = visibleCount > 3 ? "Show less" : `Show more (${hiddenCount})`;
+      btn.addEventListener("click", ()=>{
+        visibleCount = visibleCount > 3 ? 3 : top.length;
+        draw();
+      });
+      showMoreWrap.appendChild(btn);
+    }
+  }
+  draw();
 }
 
-document.getElementById("buildBtn").addEventListener("click", ()=>{
+function buildAndRenderResults(){
   const ranked = {
     core: computeScores("core"),
     mid: computeScores("mid"),
@@ -700,8 +840,46 @@ document.getElementById("buildBtn").addEventListener("click", ()=>{
   renderRankings(ranked);
   renderCombos(ranked);
   document.getElementById("results").classList.add("visible");
+}
+
+document.getElementById("buildBtn").addEventListener("click", ()=>{
+  buildAndRenderResults();
   document.getElementById("results").scrollIntoView({behavior:"smooth", block:"start"});
 });
+
+// Same rank-panel/bar-fill visual as renderRankings() (the "Top Picks Per
+// Role" table), but for ONE fixed lineup (the manual 3-player picker) and
+// ranking prefixes instead of players -- shows all 8 prefixes' final
+// (expected) score for that exact core+mid+support combo.
+function renderManualPrefixTable(coreRow, midRow, supportRow){
+  const wrap = document.getElementById("manualPrefixTable");
+  const title = document.getElementById("manualPrefixTableTitle");
+  if(!PREFIXES){ wrap.innerHTML = ""; title.style.display = "none"; return; }
+
+  const ranked = comboPrefixRanking(coreRow, midRow, supportRow);
+  if(!ranked.length){ wrap.innerHTML = ""; title.style.display = "none"; return; }
+  title.style.display = "flex";
+
+  const max = ranked[0].finalPct || 0;
+  const panel = document.createElement("div");
+  panel.className = "rank-panel";
+  panel.style.setProperty("--role-color", "var(--violet)");
+  ranked.forEach((p,i)=>{
+    const pct = max > 0 ? Math.max(4,(p.finalPct/max)*100) : 0;
+    const el = document.createElement("div");
+    el.innerHTML = `
+      <div class="rank-item">
+        <div class="n">${i+1}</div>
+        <div class="name">${p.label} <small>pick ${p.pickPct.toFixed(1)}% · bonus +${p.bonusPct.toFixed(0)}%</small></div>
+        <div class="score">${p.finalPct.toFixed(2)}%</div>
+      </div>
+      <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
+    `;
+    panel.appendChild(el);
+  });
+  wrap.innerHTML = "";
+  wrap.appendChild(panel);
+}
 
 function populateManualPrefixPanel(){
   const panel = document.getElementById("manualPrefixPanel");
@@ -716,21 +894,33 @@ function populateManualPrefixPanel(){
     mid: document.getElementById("manualMid"),
     support: document.getElementById("manualSupport"),
   };
+  const savedManual = SAVED.manual || {};
   ROLES.forEach(role=>{
     const sel = selects[role.key];
     sel.innerHTML = DATA[role.key].rows
       .map((row,i)=> `<option value="${i}">${plainLabelFor(role,row)}</option>`)
       .join("");
+    const savedIndex = savedManual[role.key];
+    if(savedIndex != null && DATA[role.key].rows[savedIndex] !== undefined){
+      sel.value = savedIndex;
+    }
+    sel.addEventListener("change", ()=>{
+      saveState({manual: {
+        core: +selects.core.value, mid: +selects.mid.value, support: +selects.support.value,
+      }});
+    });
   });
 
   const resultEl = document.getElementById("manualPrefixResult");
-  document.getElementById("manualPrefixBtn").addEventListener("click", ()=>{
+  function runLookup(){
     const coreRow = DATA.core.rows[+selects.core.value];
     const midRow = DATA.mid.rows[+selects.mid.value];
     const supportRow = DATA.support.rows[+selects.support.value];
     const ranked = comboPrefixRanking(coreRow, midRow, supportRow);
-    renderPrefixRankList(resultEl, ranked, 3);
-  });
+    renderPrefixRankList(resultEl, ranked, {initial:3, max:5});
+    renderManualPrefixTable(coreRow, midRow, supportRow);
+  }
+  document.getElementById("manualPrefixBtn").addEventListener("click", runLookup);
 }
 
 async function init(){
@@ -743,9 +933,7 @@ async function init(){
   } catch(err){
     document.getElementById("pickers").innerHTML =
       `<div style="grid-column:1/-1;color:var(--core);font-family:'JetBrains Mono',monospace;font-size:13px;">
-        Failed to load data.json. If you opened this file directly (file://),
-        fetch() is blocked by the browser -- serve this folder over HTTP instead
-        (e.g. "python -m http.server" inside site/, then open localhost).
+        Failed to load data.json
         Details: ${err.message}
       </div>`;
     return;
