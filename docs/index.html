@@ -57,6 +57,7 @@
     margin-bottom:10px;
   }
   .header-top .eyebrow{margin-bottom:0;}
+  .header-actions{display:flex;align-items:center;gap:10px;}
   .github-badge{
     display:inline-flex;
     align-items:center;
@@ -422,6 +423,95 @@
     transition:border-color .12s ease, color .12s ease;
   }
   .show-more-btn:hover{border-color:var(--violet);color:var(--text);}
+
+  .role-tabs{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;}
+  .role-tab{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    font-family:'Rajdhani',sans-serif;
+    font-weight:600;
+    font-size:13.5px;
+    background:var(--panel-2);
+    border:1px solid var(--border);
+    color:var(--muted);
+    border-radius:8px;
+    padding:8px 20px;
+    cursor:pointer;
+    transition:border-color .12s ease, color .12s ease, background .12s ease;
+  }
+  .role-tab:hover{color:var(--text);}
+  .role-tab.active{
+    color:var(--text);
+    background:var(--panel);
+    border-color:var(--role-tab-color);
+  }
+
+  .reveal-btn{
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:20px;
+    padding:6px 13px 6px 11px;
+    color:var(--muted);
+    font-family:'JetBrains Mono',monospace;
+    font-size:11.5px;
+    letter-spacing:.02em;
+    white-space:nowrap;
+    cursor:pointer;
+    transition:border-color .12s ease, color .12s ease, background .12s ease;
+  }
+  .reveal-btn svg{width:15px;height:15px;flex-shrink:0;fill:currentColor;}
+  .reveal-btn:hover{border-color:var(--teal);color:var(--text);background:var(--panel-2);}
+
+  .modal-overlay{
+    position:fixed;
+    inset:0;
+    z-index:1000;
+    background:rgba(5,7,12,.72);
+    backdrop-filter:blur(3px);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+  }
+  .modal-overlay[hidden]{display:none;}
+  .modal-box{
+    width:100%;
+    max-width:900px;
+    max-height:85vh;
+    overflow-y:auto;
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:24px 26px 28px;
+    box-shadow:0 20px 60px rgba(0,0,0,.5);
+  }
+  .modal-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    margin-bottom:20px;
+  }
+  .modal-close{
+    flex:none;
+    width:32px;
+    height:32px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:var(--panel-2);
+    border:1px solid var(--border);
+    color:var(--muted);
+    border-radius:8px;
+    cursor:pointer;
+    font-size:14px;
+    transition:border-color .12s ease, color .12s ease;
+  }
+  .modal-close:hover{color:var(--text);border-color:var(--violet);}
 </style>
 </head>
 <body>
@@ -429,14 +519,35 @@
   <header>
     <div class="header-top">
       <div class="eyebrow">TI 2026 · FANTASY LINEUP LAB</div>
-      <a class="github-badge" href="https://github.com/Ali-M129/dota2-fantasy-lineup-lab" target="_blank" rel="noopener noreferrer">
-        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
-        <span>View on GitHub</span>
-      </a>
+      <div class="header-actions">
+        <button type="button" class="reveal-btn" id="statRankToggle">
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1.5 14.5v-13a.5.5 0 0 1 1 0V14h12.5a.5.5 0 0 1 0 1h-13a.5.5 0 0 1-.5-.5Z"/><path d="M14.5 3.5a.5.5 0 0 1 .5.5v6.5a.5.5 0 0 1-1 0V5.21L9.85 9.85a.5.5 0 0 1-.7 0L7 7.71 4.35 10.35a.5.5 0 1 1-.7-.7l3-3a.5.5 0 0 1 .7 0L9.5 8.79 13.29 5H10.5a.5.5 0 0 1 0-1h4Z"/></svg>
+          <span>Stat Rankings</span>
+        </button>
+        <a class="github-badge" href="https://github.com/Ali-M129/dota2-fantasy-lineup-lab" target="_blank" rel="noopener noreferrer">
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+          <span>View on GitHub</span>
+        </a>
+      </div>
     </div>
     <h1>Suggested <span>Lineup</span></h1>
     <p class="sub">Pick 5 stats for each role (Core / Mid / Support), assign each a weight, and the tool ranks and combines the best core + best mid + best support for you.</p>
   </header>
+
+  <div class="modal-overlay" id="statRankOverlay" hidden>
+    <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="statRankModalTitle">
+      <div class="modal-head">
+        <div class="section-title" id="statRankModalTitle" style="margin:0;">Best Stats Per Banner</div>
+        <button type="button" class="modal-close" id="statRankClose" aria-label="Close">✕</button>
+      </div>
+      <p class="sub" style="margin-top:-12px;margin-bottom:6px;">Averaged across every team, independent of who's actually playing — see which stat pulls the most weight in each color slot.</p>
+      <p class="sub" style="font-size:12px;color:var(--dim);margin-bottom:24px;">Note: Lotuses Gained isn't scored yet (no data source for it), so it always shows 0.</p>
+      <div class="build-row" style="margin-bottom:24px;">
+        <div class="role-tabs" id="statRankTabs"></div>
+      </div>
+      <div class="rank-row" id="statRankRow"></div>
+    </div>
+  </div>
 
   <div class="section-title">Pick Stats & Weights <small>CHOOSE YOUR BANNERS</small></div>
   <div class="picker-row" id="pickers"></div>
@@ -538,6 +649,91 @@ function saveState(patch){
   }
 }
 const SAVED = loadSavedState();
+
+// --- Stat power rankings (per role, averaged over every team) ----------
+// Reads DATA.meta.stat_rankings, built by pipeline/score_pipeline.py's
+// compute_stat_rankings() -- {role: {color: [{name, avg}, ...]}}, already
+// sorted descending per color. Purely a "which stat is worth the most in
+// this slot" view -- no team/player picking involved.
+let statRankRole = (SAVED.statRankRole && ROLES.some(r=>r.key===SAVED.statRankRole))
+  ? SAVED.statRankRole : "core";
+
+function renderStatRankTabs(){
+  const wrap = document.getElementById("statRankTabs");
+  wrap.innerHTML = ROLES.map(role=> `
+    <button type="button" class="role-tab${role.key===statRankRole ? " active" : ""}"
+      data-role="${role.key}" style="--role-tab-color:${role.color};">
+      <span class="role-dot ${role.key}"></span>${role.label}
+    </button>
+  `).join("");
+  wrap.querySelectorAll(".role-tab").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      statRankRole = btn.dataset.role;
+      saveState({statRankRole});
+      renderStatRankTabs();
+      renderStatRankings();
+    });
+  });
+}
+
+const COLOR_LABEL = {red:"Red", green:"Green", blue:"Blue"};
+
+function renderStatRankings(){
+  const row = document.getElementById("statRankRow");
+  row.innerHTML = "";
+  const byColor = DATA.meta.stat_rankings && DATA.meta.stat_rankings[statRankRole];
+  if(!byColor){
+    row.innerHTML = `<div style="grid-column:1/-1;color:var(--dim);font-family:'JetBrains Mono',monospace;font-size:12px;">No stat ranking data in data.json yet -- run pipeline/score_pipeline.py to add it.</div>`;
+    return;
+  }
+  ["red","green","blue"].forEach(color=>{
+    const stats = byColor[color] || [];
+    if(!stats.length) return; // e.g. support has no red stats, core has no blue
+    const max = stats[0].avg;
+    const panel = document.createElement("div");
+    panel.className = "rank-panel";
+    panel.style.setProperty("--role-color", `var(--stat-${color})`);
+    panel.innerHTML = `<div class="picker-label" style="margin-bottom:10px;"><span class="banner-swatch ${color}"></span>${COLOR_LABEL[color]}</div>`;
+    stats.forEach((s,i)=>{
+      const pct = max > 0 ? Math.max(4,(s.avg/max)*100) : 0;
+      const el = document.createElement("div");
+      el.innerHTML = `
+        <div class="rank-item">
+          <div class="n">${i+1}</div>
+          <div class="name">${s.name}</div>
+          <div class="score">${s.avg.toFixed(0)}</div>
+        </div>
+        <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
+      `;
+      panel.appendChild(el);
+    });
+    row.appendChild(panel);
+  });
+}
+
+function initStatRankToggle(){
+  const openBtn = document.getElementById("statRankToggle");
+  const closeBtn = document.getElementById("statRankClose");
+  const overlay = document.getElementById("statRankOverlay");
+
+  function open(){
+    overlay.hidden = false;
+    document.body.style.overflow = "hidden";
+  }
+  function close(){
+    overlay.hidden = true;
+    document.body.style.overflow = "";
+  }
+
+  openBtn.addEventListener("click", open);
+  closeBtn.addEventListener("click", close);
+  overlay.addEventListener("click", (e)=>{
+    if(e.target === overlay) close(); // click on backdrop, not the box
+  });
+  document.addEventListener("keydown", (e)=>{
+    if(e.key === "Escape" && !overlay.hidden) close();
+  });
+}
 
 function buildPickers(){
   const container = document.getElementById("pickers");
@@ -939,6 +1135,9 @@ async function init(){
       </div>`;
     return;
   }
+  renderStatRankTabs();
+  renderStatRankings();
+  initStatRankToggle();
   buildPickers();
   populateManualPrefixPanel();
 }

@@ -446,6 +446,38 @@ def load_final_csv_for_site(path, has_player):
     return stat_cols, rows
 
 
+def compute_stat_rankings(role_columns_rows):
+    """
+    For each role, average every team's score per stat column -- entirely
+    independent of which team/player it came from -- then group those
+    averages by color and sort each color's stats highest-average-first.
+
+    This answers a different question than the per-team rankings: not
+    "which team is best on this stat" but "which stat is worth the most,
+    on average, in this color slot" -- useful for deciding what to put in
+    a banner before you've picked any teams at all.
+
+    role_columns_rows: {role: (columns, rows)} as returned by
+    load_final_csv_for_site.
+    -> {role: {color: [{"name": column_label, "avg": float}, ...]}}
+    """
+    label_color = {COLUMN_LABELS[stat]: color for stat, color in STAT_COLOR_OF.items()}
+
+    rankings = {}
+    for role, (columns, rows) in role_columns_rows.items():
+        by_color = {"red": [], "green": [], "blue": []}
+        for col in columns:
+            color = label_color.get(col)
+            if color is None or not rows:
+                continue
+            avg = sum(row[col] for row in rows) / len(rows)
+            by_color[color].append({"name": col, "avg": round(avg, 1)})
+        for stats in by_color.values():
+            stats.sort(key=lambda item: item["avg"], reverse=True)
+        rankings[role] = by_color
+    return rankings
+
+
 def export_site_json():
     """
     Build docs/data.json from whatever's currently in FINAL_DIR
@@ -456,9 +488,12 @@ def export_site_json():
     Also includes a "meta.stat_colors" block ({color: [column_label, ...]})
     built from STAT_COLOR_OF/COLUMN_LABELS, so the frontend's banner
     picker always matches whatever stats actually exist in the data --
-    it never hardcodes its own copy of this mapping.
+    it never hardcodes its own copy of this mapping. Likewise
+    "meta.stat_rankings" (see compute_stat_rankings) so the frontend's
+    "best stats per banner, no teams" view stays in sync too.
     """
     data = {}
+    role_columns_rows = {}
     for role, (filename, has_player) in SITE_ROLE_FILES.items():
         path = os.path.join(FINAL_DIR, filename)
         if not os.path.exists(path):
@@ -466,11 +501,15 @@ def export_site_json():
             return None
         columns, rows = load_final_csv_for_site(path, has_player)
         data[role] = {"columns": columns, "rows": rows}
+        role_columns_rows[role] = (columns, rows)
 
     stat_colors = {"red": [], "green": [], "blue": []}
     for stat_name, color in STAT_COLOR_OF.items():
         stat_colors[color].append(COLUMN_LABELS[stat_name])
-    data["meta"] = {"stat_colors": stat_colors}
+    data["meta"] = {
+        "stat_colors": stat_colors,
+        "stat_rankings": compute_stat_rankings(role_columns_rows),
+    }
 
     os.makedirs(SITE_DIR, exist_ok=True)
     out_path = os.path.join(SITE_DIR, "data.json")
